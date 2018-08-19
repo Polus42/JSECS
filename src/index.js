@@ -9,15 +9,11 @@ ECS.Entity = function Entity(){
 
     // The component data will live in this object
     this.components = {};
-    this.componentsNames = [];
 
     return this;
 };
 // keep track of entities created
 ECS.Entity.prototype._count = 0;
-function containsAll(needles, haystack){ 
-    return needles.every((val) => haystack.includes(val));
-  }
 
 ECS.Entity.prototype.addComponent = function addComponent ( component ){
     // Add component data to the entity
@@ -26,10 +22,9 @@ ECS.Entity.prototype.addComponent = function addComponent ( component ){
     if(this.components[component.name]!=undefined)
         return this;
       this.components[component.name] = component;
-      this.componentsNames.push(component.name);
             for (let i = 0; i < ECS.System.AllSystems.length; i++) {
                 const element = ECS.System.AllSystems[i];
-                if(containsAll(element.dependencies,this.componentsNames))
+                if(element.CanAdd(this))
                 {
                     element.subscribedEntities.push(this);
                 }
@@ -49,7 +44,7 @@ ECS.Entity.prototype.removeComponent = function removeComponent ( componentName 
 
     for (let i = 0; i < ECS.System.AllSystems.length; i++) {
         const element = ECS.System.AllSystems[i];
-        if(containsAll(element.dependencies,this.componentsNames))
+        if(element.CanAdd(this))
         {
             element.subscribedEntities.splice(element.subscribedEntities.indexOf(this),1);
         }
@@ -57,7 +52,6 @@ ECS.Entity.prototype.removeComponent = function removeComponent ( componentName 
 
     // Remove component data by removing the reference to it
     delete this.components[name];
-    this.componentsNames.splice(this.componentsNames.indexOf(name),1);
     return this;
 };
 
@@ -86,6 +80,9 @@ ECS.System.prototype.Execute = function Execute()
     for (let i = 0; i < this.subscribedEntities.length; i++) {
         const element = this.function(this.subscribedEntities[i]);
     }
+}
+ECS.System.prototype.CanAdd = function CanAdd(entity) {
+    return this.dependencies.every((val) => entity.components[val]!=undefined);
 }
 let drawSystem = new ECS.System(e=>{console.log(e)},["size"]);
 /*function drawSystem(entities)
