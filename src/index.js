@@ -1,7 +1,7 @@
 // Core ////////////////////////////////////////////////////////////////////////////////////
 var Entity = class
 {
-    constructor()
+    constructor(archetype)
     {
         // Generate a pseudo random ID
         this.id = Entity.prototype.Count;
@@ -9,6 +9,10 @@ var Entity = class
         Entity.prototype.Count++;
         // The component data will live in this object
         this.components = {};
+        if(archetype!=undefined)
+        for (let i = 0; i < archetype.length; i++) {
+            this.addComponent(new Component({}, archetype[i]));
+        }
     }
     addComponent ( component ){
         // Add component data to the entity
@@ -86,25 +90,13 @@ var System = class {
 }
 System.AllSystems = [];
 System.UpdateAll = ()=>System.AllSystems.every((val)=>val.Execute());
-let drawSystem = new System(e=>{e.components["size"].value*=2},["size"]);
 // Tests ////////////////////////////////////////////////////////////////////////////////////
-x=a.getContext`2d`;
-x.fillStyle = 'rgb(200,0,0)';
-x.fillRect(10,10,50,50);
-var lastLoop = new Date;
-setInterval(e=>{ update();
-    for (let index = 0; index < 100; index++) {
-        let ent  = new Entity();
-        ent.addComponent(new Component(20,"size"));
-    }
-    console.log(e2.components["size"]);
-var thisLoop = new Date;
-var fps = 1000 / (thisLoop - lastLoop);
-console.log(fps + "  //  "+Entity.prototype.Count);
-lastLoop = thisLoop;
-},33);
+    let drawSystem = new System(e=>{
+        console.log("Drawing : "+e.id)
+    
+    },["size"]);
+setInterval(e=>{ update()},33);
 let e = new Entity();
-let e2 = new Entity();
 e.addComponent(new Component(10,"size"));
 function update() {
     System.UpdateAll();
