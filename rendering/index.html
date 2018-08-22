@@ -72,7 +72,7 @@ function r(min, max) {
 }
 
 function rp() {
-  return r(-20, 20);
+  return r(-100, 100);
 }
 
 // make translations and colors, colors are separated by face
@@ -129,9 +129,12 @@ var faceMatrices = [
 function render(time) {
     gl.canvas.width = 1000;
     gl.canvas.height = 1000;
-    for (let index = 0; index < translations.length; index++) {
-        translations[index] += 0.5;
-    }
+    /*for (let index = 0; index < translations.length; index++) {
+        translations[index] = 0;
+    }*/
+    translations[0] = 1;
+    translations[1] = 0;
+    translations[2] = 5;
     gl.bindBuffer(gl.ARRAY_BUFFER, translationBuffer);
 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(translations), gl.STATIC_DRAW);
   time *= 0.001;
